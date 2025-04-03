@@ -577,22 +577,22 @@
             else if (lastPercentage >= 60) resultEmoji = '😊';
             else resultEmoji = '😅';
 
-            const textToCopy = `Pokémon or Tech? ${resultEmoji}\nI scored ${correctAnswers}/${quizLength}! (${lastPercentage}%)\n\nCan you beat my score?\n[YOUR_WEBSITE_LINK_HERE]`; // <-- REPLACE PLACEHOLDER
+            const textToCopy = `Pokémon or Tech\nI scored ${lastPercentage}% ${resultEmoji}\n\nhttps://pokémon-or-tech.netlify.app`;
 
             try {
-                await navigator.clipboard.writeText(textToCopy);
-                // Success feedback
-                shareButtonTooltip.textContent = 'Copied!';
-                setTimeout(() => {
-                     shareButtonTooltip.textContent = 'Copy Results'; // Reset after 2 seconds
-                }, 2000);
+            await navigator.clipboard.writeText(textToCopy);
+            // Success feedback
+            shareButtonTooltip.textContent = 'Copied!';
+            setTimeout(() => {
+                 shareButtonTooltip.textContent = 'Copy Results'; // Reset after 2 seconds
+            }, 2000);
             } catch (err) {
-                console.error('Failed to copy results: ', err);
-                // Optional: Show error feedback to user
-                shareButtonTooltip.textContent = 'Copy Failed!';
-                 setTimeout(() => {
-                     shareButtonTooltip.textContent = 'Copy Results';
-                }, 2000);
+            console.error('Failed to copy results: ', err);
+            // Optional: Show error feedback to user
+            shareButtonTooltip.textContent = 'Copy Failed!';
+             setTimeout(() => {
+                 shareButtonTooltip.textContent = 'Copy Results';
+            }, 2000);
             }
         }
 
