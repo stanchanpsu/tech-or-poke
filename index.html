@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon or Tech Babble?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide-static@latest/umd/lucide.js"></script>
+
+    <style>
+        /* Basic body styling - REVERTED COLORS */
+        body {
+            font-family: 'Press Start 2P', sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Reverted background gradient */
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            color: #222; /* Default dark text */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Main container styling - REVERTED COLORS */
+        .container {
+            width: 95%;
+            max-width: 800px;
+            padding: 1.5rem;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2); /* Original shadow */
+            margin: 2rem auto;
+            border: 4px solid #1d3557; /* Dark blue border */
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        /* Quiz Progress Bar Styling - REVERTED COLORS */
+        #quiz-progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0; /* Light gray background */
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 2px solid #1d3557; /* Dark blue border */
+        }
+
+        #quiz-progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #ffcb05; /* Pokémon yellow */
+            border-radius: 8px;
+            transition: width 0.5s ease-in-out;
+            /* FIX: Revert text align to center */
+            text-align: center;
+            padding-right: 0; /* Remove right padding */
+            box-sizing: border-box;
+            line-height: 16px; /* Adjust for vertical centering */
+            font-size: 0.7rem;
+            color: #3b4cca; /* Pokémon blue text */
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+
+        /* Main heading styling - REVERTED COLORS */
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #e63946; /* Red color */
+            text-shadow: 2px 2px #1d3557; /* Dark blue shadow */
+        }
+        @media (max-width: 400px){
+           h1{ font-size: 1.5rem }
+        }
+
+        /* Sub-heading styling - REVERTED COLORS */
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #1d3557; /* Dark blue color */
+        }
+
+        /* Question display area styling - REVERTED COLORS */
+        #question-area {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 3px dashed #a8dadc; /* Light blue dashed border */
+            border-radius: 0.75rem;
+            background-color: #f1faee; /* Very light green background */
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1d3557; /* Dark blue text */
+        }
+         @media (max-width: 400px){
+            #question-area{ font-size: 1rem; min-height: 60px; }
+         }
+
+        /* Grid layout for buttons */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+         @media (max-width: 400px){
+             .btn-grid{ gap: 0.5rem; }
+         }
+
+        /* General button styling - REVERTED COLORS */
+        .btn {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 3px solid #1d3557; /* Dark blue border */
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15); /* Original shadow */
+            font-family: 'Press Start 2P', sans-serif;
+            text-shadow: 1px 1px #00000040;
+        }
+         .btn:active {
+             transform: translateY(2px);
+             box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.1);
+         }
+         .btn:disabled {
+            cursor: not-allowed;
+            filter: grayscale(60%);
+         }
+
+        /* Specific button base colors - REVERTED */
+        #pokemon-button { background-color: #ffcb05; color: #3b4cca; }
+        #tech-babble-button { background-color: #45a29e; color: #ffffff; }
+        #next-button { background-color: #007bff; color: white; border-color: #0056b3; }
+        #reset-button { background-color: #e63946; color: white; border-color: #a12830; }
+
+        /* Hover states - REVERTED */
+        #pokemon-button:hover:not(:disabled) { background-color: #e6b804; box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.2); }
+        #tech-babble-button:hover:not(:disabled) { background-color: #3a8f8b; box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.2); }
+        #next-button:hover:not(:disabled) { background-color: #0056b3; box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.2); }
+        #reset-button:hover { background-color: #d32f2f; box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.2); }
+
+        /* Feedback styles applied via JS - REVERTED (using simple green/red) */
+        .feedback-correct {
+             background-color: #4CAF50 !important; /* Green */
+             color: white !important;
+             border-color: #388E3C !important;
+        }
+        .feedback-incorrect {
+             background-color: #f44336 !important; /* Red */
+             color: white !important;
+             border-color: #d32f2f !important;
+        }
+
+
+        /* Result container styling */
+        #result-container {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #result-container p {
+            margin-bottom: 1rem;
+            color: #1d3557; /* Dark blue text */
+        }
+
+        /* Score Progress Bar Styling (End Result) - REVERTED COLORS */
+        #score-progress-container {
+            width: 80%;
+            height: 30px;
+            background-color: #e0e0e0; /* Light gray background */
+            border-radius: 15px;
+            margin: 1rem auto;
+            overflow: hidden;
+            border: 3px solid #1d3557; /* Dark blue border */
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        #score-progress-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 12px;
+            transition: width 0.8s ease-out, background-color 0.5s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white; /* Keep text white */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+
+        /* Classes for score bar color - REVERTED */
+        .score-low { background: linear-gradient(to right, #e63946, #c12e39); } /* Red gradient */
+        .score-medium { background: linear-gradient(to right, #ff9f1c, #e78f0a); } /* Orange gradient */
+        .score-high { background: linear-gradient(to right, #70e000, #5fad00); } /* Green gradient */
+
+
+        /* Reset button styling (colors handled above) */
+        #reset-button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            width: auto;
+            margin: 1rem auto 0;
+        }
+
+        /* Next button styling (colors handled above) */
+        #next-button {
+            margin: 1.5rem auto 0;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            display: none;
+            width: auto;
+        }
+
+        /* Share Button Styling */
+        #share-button {
+             background: none;
+             border: none;
+             padding: 0.5rem; /* Padding around icon */
+             margin-left: 1rem; /* Space from reset button if needed */
+             margin-top: 1rem; /* Align with reset button */
+             cursor: pointer;
+             color: #007bff; /* Blue icon */
+             display: inline-flex; /* Align icon */
+             align-items: center;
+             justify-content: center;
+             border-radius: 50%; /* Make it round */
+             width: 40px; /* Fixed size */
+             height: 40px;
+             transition: background-color 0.2s ease;
+             box-shadow: none; /* Remove default btn shadow */
+        }
+         #share-button:hover {
+             background-color: rgba(0, 123, 255, 0.1); /* Light blue background on hover */
+         }
+         #share-button svg {
+             width: 24px; /* Icon size */
+             height: 24px;
+         }
+         #share-button .tooltip { /* Simple tooltip */
+            position: absolute;
+            background-color: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            bottom: 110%; /* Position above button */
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+         }
+         #share-button:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+         }
+
+
+        /* Footer Styling - UPDATED LAYOUT */
+        footer {
+            width: 100%;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            text-align: center;
+            color: #f0f0f0; /* Lighter text for contrast on blue bg */
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        footer div { /* Use divs for block layout */
+             margin-bottom: 0.5rem; /* Space between lines */
+        }
+        footer a {
+            color: #a8dadc; /* Light blue link */
+            text-decoration: underline;
+            display: inline-flex;
+            align-items: center;
+        }
+         footer a:hover {
+             color: #f1faee; /* Lighter blue on hover */
+         }
+         footer .inspiration-link {
+             font-size: 0.7rem; /* Smaller font size */
+             color: #c0c0c0; /* Dimmer color */
+         }
+         footer .inspiration-link:hover {
+             color: #e0e0e0;
+         }
+        footer img.icon, footer svg.icon { /* Style both img and svg */
+            width: 20px;
+            height: 20px;
+            margin-right: 0.3rem;
+            vertical-align: middle;
+            /* Remove green filter */
+            filter: none;
+            fill: currentColor; /* Make SVG icons inherit link color */
+        }
+        /* Style specifically for lucide SVG */
+        footer svg.icon {
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="quiz-progress-container">
+            <div id="quiz-progress-bar">0%</div>
+        </div>
+
+        <h1>Pokémon or Tech Babble?</h1>
+        <h2>Test your knowledge!</h2>
+        <div id="question-area">Loading...</div>
+        <div class="btn-grid">
+            <button id="pokemon-button" class="btn">Pokémon</button>
+            <button id="tech-babble-button" class="btn">Tech Babble</button>
+        </div>
+
+        <button id="next-button" class="btn">Next Question</button>
+
+        <div id="result-container">
+            <p style="display:none;">Your Score: <span id="score">0</span></p>
+            <p>Correct Answers: <span id="correct-answers">0</span></p>
+            <p>Incorrect Answers: <span id="incorrect-answers">0</span></p>
+
+            <div id="score-progress-container">
+                <div id="score-progress-bar">0%</div>
+            </div>
+
+             <p style="display:none;">Percentage: <span id="percentage">0%</span></p>
+
+             <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1rem;">
+                 <button id="reset-button" class="btn">Play Again</button>
+                 <button id="share-button" title="Share Results">
+                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+                     <span class="tooltip">Copy Results</span> </button>
+             </div>
+        </div>
+    </div>
+
+    <footer>
+        <div> <a href="https://www.linkedin.com/in/chanstan/" target="_blank" rel="noopener noreferrer" title="LinkedIn Profile">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="icon"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+             </a>
+        </div>
+        <div> <a href="https://pixelastic.github.io/pokemonorbigdata/" target="_blank" rel="noopener noreferrer" class="inspiration-link">
+                 Inspired by Pokemon or Big Data
+             </a>
+        </div>
+    </footer>
+
+    <script>
+        // Data array (remains the same)
+        const data = [ /* ... data ... */
+             // Pokémon
+            { text: "pikachu", type: "pokemon" }, { text: "charizard", type: "pokemon" },
+            { text: "blastoise", type: "pokemon" }, { text: "venusaur", type: "pokemon" },
+            { text: "rayquaza", type: "pokemon" }, { text: "garchomp", type: "pokemon" },
+            { text: "umbreon", type: "pokemon" }, { text: "sylveon", type: "pokemon" },
+            { text: "grookey", type: "pokemon" }, { text: "scorbunny", type: "pokemon" },
+            { text: "sobble", type: "pokemon" }, { text: "yamper", type: "pokemon" },
+            { text: "toxtricity", type: "pokemon" }, { text: "leafeon", type: "pokemon" },
+            { text: "glaceon", type: "pokemon" }, { text: "espeon", type: "pokemon" },
+            { text: "snorlax", type: "pokemon" }, { text: "dragonite", type: "pokemon" },
+            { text: "mewtwo", type: "pokemon" }, { text: "lugia", type: "pokemon" },
+            { text: "ho-oh", type: "pokemon" }, { text: "celebi", type: "pokemon" },
+            { text: "kyogre", type: "pokemon" }, { text: "groudon", type: "pokemon" },
+            { text: "dialga", type: "pokemon" }, { text: "palkia", type: "pokemon" },
+            { text: "arceus", type: "pokemon" }, { text: "victini", type: "pokemon" },
+            { text: "reshiram", type: "pokemon" }, { text: "zekrom", type: "pokemon" },
+            { text: "xerneas", type: "pokemon" }, { text: "yveltal", type: "pokemon" },
+            { text: "zacian", type: "pokemon" }, { text: "zamazenta", type: "pokemon" },
+            { text: "eternatus", type: "pokemon" }, { text: "regidrago", type: "pokemon" },
+            { text: "glastrier", type: "pokemon" }, { text: "spectrier", type: "pokemon" },
+            { text: "enamorus", type: "pokemon" }, { text: "koraidon", type: "pokemon" },
+            { text: "miraidon", type: "pokemon" }, { text: "terapagos", type: "pokemon" },
+            { text: "pecharunt", type: "pokemon" }, { text: "okidogi", type: "pokemon" },
+            { text: "munkidori", type: "pokemon" }, { text: "fezandipiti", type: "pokemon" },
+            { text: "jigglypuff", type: "pokemon"}, { text: "meowth", type: "pokemon"},
+            { text: "psyduck", type: "pokemon"}, { text: "geodude", type: "pokemon"},
+            { text: "mudkip", type: "pokemon"}, { text: "torchic", type: "pokemon"},
+            { text: "treecko", type: "pokemon"}, { text: "gardevoir", type: "pokemon"},
+            { text: "lucario", type: "pokemon"}, { text: "zoroark", type: "pokemon"},
+            { text: "greninja", type: "pokemon"}, { text: "mimikyu", type: "pokemon"},
+
+            // Tech Babble (Single words, products, sound-alikes)
+            { text: "hadoop", type: "tech-babble" }, { text: "spark", type: "tech-babble" },
+            { text: "kafka", type: "tech-babble" }, { text: "cassandra", type: "tech-babble" },
+            { text: "kubernetes", type: "tech-babble" }, { text: "tensorflow", type: "tech-babble" },
+            { text: "pytorch", type: "tech-babble" }, { text: "docker", type: "tech-babble" },
+            { text: "nosql", type: "tech-babble" }, { text: "mapreduce", type: "tech-babble" },
+            { text: "hbase", type: "tech-babble" }, { text: "hive", type: "tech-babble" },
+            { text: "presto", type: "tech-babble" }, { text: "airflow", type: "tech-babble" },
+            { text: "tableau", type: "tech-babble" }, { text: "redshift", type: "tech-babble" },
+            { text: "snowflake", type: "tech-babble" }, { text: "databricks", type: "tech-babble" },
+            { text: "graphql", type: "tech-babble" }, { text: "grpc", type: "tech-babble" },
+            { text: "websocket", type: "tech-babble" }, { text: "oauth", type: "tech-babble" },
+            { text: "saml", type: "tech-babble" }, { text: "openid", type: "tech-babble" },
+            { text: "splunk", type: "tech-babble" }, { text: "kibana", type: "tech-babble" },
+            { text: "grafana", type: "tech-babble" }, { text: "prometheus", type: "tech-babble" },
+            { text: "jaeger", type: "tech-babble" }, { text: "istio", type: "tech-babble" },
+            { text: "envoy", type: "tech-babble" }, { text: "flux", type: "tech-babble" },
+            { text: "argo", type: "tech-babble" }, { text: "helm", type: "tech-babble" },
+            { text: "pulumi", type: "tech-babble" }, { text: "vagrant", type: "tech-babble" },
+            { text: "packer", type: "tech-babble" }, { text: "consul", type: "tech-babble" },
+            { text: "vault", type: "tech-babble" }, { text: "nomad", type: "tech-babble" },
+            { text: "zookeeper", type: "tech-babble" }, { text: "mesos", type: "tech-babble" },
+            { text: "flink", type: "tech-babble" }, { text: "druid", type: "tech-babble" },
+            { text: "pinot", type: "tech-babble" }, { text: "clickhouse", type: "tech-babble" },
+            { text: "scylla", type: "tech-babble" }, { text: "cockroach", type: "tech-babble" },
+            { text: "vitess", type: "tech-babble" }, { text: "etcd", type: "tech-babble" },
+            { text: "rook", type: "tech-babble" }, { text: "longhorn", type: "tech-babble" },
+            { text: "knative", type: "tech-babble" }, { text: "tekton", type: "tech-babble" },
+            { text: "spinnaker", type: "tech-babble" }, { text: "jenkins", type: "tech-babble" },
+            { text: "artifactory", type: "tech-babble" }, { text: "nexus", type: "tech-babble" },
+            { text: "sonarqube", type: "tech-babble" }, { text: "sentry", type: "tech-babble" },
+            { text: "datadog", type: "tech-babble" }, { text: "newrelic", type: "tech-babble" },
+            { text: "ansible", type: "tech-babble" }, { text: "terraform", type: "tech-babble"},
+            { text: "chef", type: "tech-babble" }, { text: "puppet", type: "tech-babble" },
+            { text: "celery", type: "tech-babble" }, { text: "fastapi", type: "tech-babble" },
+            { text: "django", type: "tech-babble" }, { text: "flask", type: "tech-babble" },
+            { text: "ruby", type: "tech-babble" }, { text: "python", type: "tech-babble" },
+            { text: "perl", type: "tech-babble" }, { text: "swift", type: "tech-babble" },
+            { text: "kotlin", type: "tech-babble" }, { text: "rust", type: "tech-babble" },
+            { text: "scala", type: "tech-babble" }, { text: "elixir", type: "tech-babble" },
+            { text: "haskell", type: "tech-babble" }, { text: "clojure", type: "tech-babble" }
+        ];
+
+        // Game state variables
+        let score = 0;
+        let currentQuestion;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let questionCount = 0; // 0-based index
+        let usedQuestions = [];
+        const quizLength = 20;
+        let lastPercentage = 0; // Store last calculated percentage for sharing
+
+        // Get references to DOM elements
+        const questionArea = document.getElementById("question-area");
+        const pokemonButton = document.getElementById("pokemon-button");
+        const techBabbleButton = document.getElementById("tech-babble-button");
+        const resultContainer = document.getElementById("result-container");
+        const scoreDisplay = document.getElementById("score");
+        const resetButton = document.getElementById("reset-button");
+        const shareButton = document.getElementById("share-button"); // Share button
+        const shareButtonTooltip = shareButton.querySelector('.tooltip'); // Tooltip span
+        const correctAnswersDisplay = document.getElementById("correct-answers");
+        const incorrectAnswersDisplay = document.getElementById("incorrect-answers");
+        const nextButton = document.getElementById("next-button");
+        const percentageDisplay = document.getElementById("percentage");
+        const quizProgressBar = document.getElementById("quiz-progress-bar");
+        const scoreProgressBarContainer = document.getElementById("score-progress-container");
+        const scoreProgressBar = document.getElementById("score-progress-bar");
+
+        // Function to update the quiz progress bar
+        function updateQuizProgress() {
+            const progress = Math.min(100, ((questionCount + 1) / quizLength) * 100);
+            quizProgressBar.style.width = `${progress}%`;
+            quizProgressBar.textContent = `${Math.round(progress)}%`; // Show text always (center aligned)
+        }
+
+        // Function to get a random, unused question
+        function getRandomQuestion() {
+            if (questionCount >= quizLength) { return null; }
+            const availableQuestions = data.filter((_, index) => !usedQuestions.includes(index));
+            if (availableQuestions.length === 0) { console.error("Ran out of unique questions!"); return null; }
+            const randomIndexInData = Math.floor(Math.random() * availableQuestions.length);
+            const chosenQuestion = availableQuestions[randomIndexInData];
+            const originalIndex = data.findIndex(item => item.text === chosenQuestion.text && item.type === chosenQuestion.type && !usedQuestions.includes(data.indexOf(item)));
+            if (originalIndex !== -1) { usedQuestions.push(originalIndex); }
+            else { console.error("Could not find original index for:", chosenQuestion); }
+            return chosenQuestion;
+        }
+
+        // Function to display the current question
+        function displayQuestion() {
+            currentQuestion = getRandomQuestion();
+            if (!currentQuestion) { showResults(); return; }
+            questionArea.textContent = `"${currentQuestion.text}"`;
+            pokemonButton.disabled = false;
+            techBabbleButton.disabled = false;
+
+            // Reset button styles from feedback
+            pokemonButton.classList.remove('feedback-correct', 'feedback-incorrect');
+            techBabbleButton.classList.remove('feedback-correct', 'feedback-incorrect');
+
+            // Hide result container and reset button
+            resultContainer.style.display = "none";
+            resetButton.style.display = "none";
+            updateQuizProgress();
+        }
+
+        // Function to check the user's answer
+        function checkAnswer(userAnswer) {
+            if (pokemonButton.disabled || techBabbleButton.disabled) { return; }
+
+            let isCorrect = false;
+            if (userAnswer === currentQuestion.type) {
+                score++; correctAnswers++;
+                questionArea.textContent = `Correct!`;
+                isCorrect = true;
+            } else {
+                incorrectAnswers++;
+                questionArea.textContent = `Incorrect! It's ${currentQuestion.type}.`;
+            }
+            correctAnswersDisplay.textContent = correctAnswers;
+            incorrectAnswersDisplay.textContent = incorrectAnswers;
+
+            pokemonButton.disabled = true;
+            techBabbleButton.disabled = true;
+
+            // Apply feedback styling using CSS classes
+            const correctButton = (currentQuestion.type === 'pokemon') ? pokemonButton : techBabbleButton;
+            const incorrectButton = (currentQuestion.type === 'pokemon') ? techBabbleButton : pokemonButton;
+            correctButton.classList.add('feedback-correct');
+            incorrectButton.classList.add('feedback-incorrect');
+
+            // Show "Next Question" button if not the last question
+            if (questionCount < quizLength - 1) {
+                nextButton.style.display = "block";
+            } else {
+                showResults();
+            }
+        }
+
+        // Function to display the final results
+        function showResults() {
+            const percentage = (correctAnswers / quizLength) * 100;
+            lastPercentage = percentage.toFixed(1); // Store for sharing
+            questionArea.textContent = `Quiz Finished!`;
+
+            // Hide game elements, show results
+            pokemonButton.style.display = "none";
+            techBabbleButton.style.display = "none";
+            nextButton.style.display = "none";
+            resetButton.style.display = "inline-block"; // Reset is inside results
+            resultContainer.style.display = "flex"; // Show results container
+
+            // Update Score Progress Bar
+            scoreProgressBarContainer.style.display = 'block';
+            scoreProgressBar.style.width = `${percentage}%`;
+            scoreProgressBar.textContent = `${lastPercentage}%`;
+            scoreProgressBar.classList.remove('score-low', 'score-medium', 'score-high');
+            if (percentage < 40) { scoreProgressBar.classList.add('score-low'); }
+            else if (percentage < 75) { scoreProgressBar.classList.add('score-medium'); }
+            else { scoreProgressBar.classList.add('score-high'); }
+
+            // Ensure share button tooltip is reset
+             shareButtonTooltip.textContent = 'Copy Results';
+        }
+
+        // --- Share Functionality ---
+        async function copyResultsToClipboard() {
+            // Simple emoji representation
+            let resultEmoji = '🤔'; // Default
+            if (lastPercentage >= 80) resultEmoji = '🥳';
+            else if (lastPercentage >= 60) resultEmoji = '😊';
+            else resultEmoji = '😅';
+
+            const textToCopy = `Pokémon or Tech Babble? ${resultEmoji}\nI scored ${correctAnswers}/${quizLength}! (${lastPercentage}%)\n\nCan you beat my score?\n[YOUR_WEBSITE_LINK_HERE]`; // <-- REPLACE PLACEHOLDER
+
+            try {
+                await navigator.clipboard.writeText(textToCopy);
+                // Success feedback
+                shareButtonTooltip.textContent = 'Copied!';
+                setTimeout(() => {
+                     shareButtonTooltip.textContent = 'Copy Results'; // Reset after 2 seconds
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy results: ', err);
+                // Optional: Show error feedback to user
+                shareButtonTooltip.textContent = 'Copy Failed!';
+                 setTimeout(() => {
+                     shareButtonTooltip.textContent = 'Copy Results';
+                }, 2000);
+            }
+        }
+
+        // Add event listeners to buttons
+        pokemonButton.addEventListener("click", () => checkAnswer("pokemon"));
+        techBabbleButton.addEventListener("click", () => checkAnswer("tech-babble"));
+
+        nextButton.addEventListener("click", () => {
+             nextButton.style.display = "none";
+             questionCount++;
+             displayQuestion();
+        });
+
+        resetButton.addEventListener("click", () => {
+            // Reset game state
+            score = 0; correctAnswers = 0; incorrectAnswers = 0; questionCount = 0; usedQuestions = []; lastPercentage = 0;
+            // Reset displays
+            correctAnswersDisplay.textContent = correctAnswers; incorrectAnswersDisplay.textContent = incorrectAnswers;
+            // Reset UI elements
+            pokemonButton.style.display = "inline-block"; techBabbleButton.style.display = "inline-block";
+            pokemonButton.disabled = false; techBabbleButton.disabled = false;
+            pokemonButton.classList.remove('feedback-correct', 'feedback-incorrect');
+            techBabbleButton.classList.remove('feedback-correct', 'feedback-incorrect');
+            nextButton.style.display = "none";
+            resetButton.style.display = "none";
+            resultContainer.style.display = "none";
+            // Reset progress bars
+            quizProgressBar.style.width = '0%'; quizProgressBar.textContent = '0%';
+            scoreProgressBar.style.width = '0%'; scoreProgressBar.textContent = '0%';
+            scoreProgressBar.classList.remove('score-low', 'score-medium', 'score-high');
+            // Start the quiz again
+            displayQuestion();
+        });
+
+         // Share button listener
+         shareButton.addEventListener('click', copyResultsToClipboard);
+
+
+        // Initial call to start the quiz
+        displayQuestion();
+
+        // Initialize Lucide icons (if using the UMD script)
+        // This might be needed depending on how you load Lucide
+        // if (typeof lucide !== 'undefined') {
+        //     lucide.createIcons();
+        // }
+
+    </script>
+</body>
+</html>
